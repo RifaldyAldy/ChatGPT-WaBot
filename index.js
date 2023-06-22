@@ -36,16 +36,28 @@ async function connectToWhatsapp() {
   // Fungsi untuk memantau pesan masuk
   sock.ev.on('messages.upsert', async ({ messages, type }) => {
     console.log(`Tipe pesan : ${type}`);
-    console.log(messages);
-    if (type === 'notify') {
+    if (type === 'notify' && !messages[0].key.fromMe) {
       try {
+        console.log(messages);
         const number = messages[0].key.remoteJid;
-        const chat = messages[0].message.conversation;
+        let chat = messages[0].message.conversation;
+        if (!chat) {
+          chat = messages[0].message.extendedTextMessage.text;
+        }
+
+        //membuat variabel untuk mengecek apakah pesan dari group dan mention bot
+        const isMessageGroup = number.includes('@g.us');
+        const isMessageMentionBot = chat.includes('@628388995241');
+
         console.log(number);
         console.log(chat);
         if (chat.toLowerCase() === 'ping') {
-          const send = await sock.sendMessage(number, { text: 'Halo, selamat datang di AlfaMampus!' }, { quoted: messages[0] }, 1000);
-          console.log(messages[1]);
+          const send = await sock.sendMessage(number, { text: 'Halo, selamat datang di AlfaMampus!' }, { quoted: messages[0] }, 2000);
+        }
+
+        //logic jika mention bot saja
+        if (isMessageGroup && isMessageMentionBot) {
+          await sock.sendMessage(number, { text: 'iya, ada yang bisa saya bantu?' }, { quoted: messages[0] }, 2000);
         }
       } catch (e) {
         console.log(e);
