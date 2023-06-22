@@ -37,13 +37,19 @@ async function connectToWhatsapp() {
   sock.ev.on('messages.upsert', async ({ messages, type }) => {
     console.log(`Tipe pesan : ${type}`);
     console.log(messages);
-    const number = messages[0].key.remoteJid;
-    const chat = messages[0].message.conversation;
-    console.log(number);
-    console.log(chat);
-    if (chat.toLowerCase() === 'ping') {
-      const send = await sock.sendMessage(number, { text: 'Halo, selamat datang di AlfaMampus!' }, { quoted: messages[0] }, 1000);
-      console.log(messages[1]);
+    if (type === 'notify') {
+      try {
+        const number = messages[0].key.remoteJid;
+        const chat = messages[0].message.conversation;
+        console.log(number);
+        console.log(chat);
+        if (chat.toLowerCase() === 'ping') {
+          const send = await sock.sendMessage(number, { text: 'Halo, selamat datang di AlfaMampus!' }, { quoted: messages[0] }, 1000);
+          console.log(messages[1]);
+        }
+      } catch (e) {
+        console.log(e);
+      }
     }
   });
 }
