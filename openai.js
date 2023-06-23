@@ -1,7 +1,10 @@
 const { Configuration, OpenAIApi } = require('openai');
 
+const key = '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';
+// const key = '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';
 const configuration = new Configuration({
-  apiKey: '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',
+  apiKey: key,
+  baseURL: 'https://api.openai.com/v1/chat/completions',
 });
 const openai = new OpenAIApi(configuration);
 
@@ -16,7 +19,8 @@ const GPT = async (chat) => {
     presence_penalty: 0.0,
   });
 
-  return response.data.choices[0].text;
+  // return response.data.choices[0].text;
+  return response.data.choices[0].text || 'saya tidak tau!';
 };
 
 GPT()
@@ -24,6 +28,7 @@ GPT()
     console.log(result);
   })
   .catch((e) => {
-    console.log('Error : ', e);
+    console.log(e);
   });
+
 module.exports = GPT;
