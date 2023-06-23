@@ -45,7 +45,8 @@ async function connectToWhatsapp() {
         if (!chat) {
           chat = messages[0].message.extendedTextMessage.text;
         }
-        const ambilRequest = chat.split(' ').slice(1).join(' ').toString();
+        const ambilRequestChat = chat.split(' ').slice(1).join(' ').toString();
+        const ambilRequest = ambilRequestChat.split(' ')[0];
 
         //membuat variabel untuk mengecek apakah pesan dari group dan mention bot
         const isMessageGroup = number.includes('@g.us');
@@ -58,10 +59,11 @@ async function connectToWhatsapp() {
         }
 
         //logic jika mention bot saja
-        if (isMessageGroup && isMessageMentionBot) {
-          const req = await GPT(ambilRequest);
+        if (isMessageGroup && isMessageMentionBot && ambilRequest === '/nanya') {
+          await sock.sendMessage(number, { text: 'Sebentar sedang mikir...' }, { quoted: messages[0] }, 2000);
+          const req = await GPT(ambilRequestChat);
           await sock.sendMessage(number, { text: req }, { quoted: messages[0] }, 2000);
-          console.log(ambilRequest);
+          console.log(ambilRequestChat);
         }
       } catch (e) {
         console.log(e);
