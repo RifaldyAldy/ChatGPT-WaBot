@@ -1,7 +1,11 @@
 const { Configuration, OpenAIApi } = require('openai');
 require('dotenv').config();
 
-const key = process.env.API_KEY;
+let key = process.env.API_KEY;
+key = key
+  .split('')
+  .slice(0, key.length - 1)
+  .join('');
 console.log(key);
 // const key = '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';
 const configuration = new Configuration({
