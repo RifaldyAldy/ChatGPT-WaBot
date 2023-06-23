@@ -1,5 +1,9 @@
 const { Configuration, OpenAIApi } = require('openai');
+require('dotenv').config();
 
+const key = process.env.API_KEY;
+console.log(key);
+// const key = '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';
 const configuration = new Configuration({
   apiKey: key,
   baseURL: 'https://api.openai.com/v1/chat/completions',
