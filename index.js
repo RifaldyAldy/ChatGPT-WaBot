@@ -1,6 +1,7 @@
 // Menambahkan dependencies
 const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = require('@whiskeysockets/baileys');
 const Boom = require('@hapi/boom');
+const GPT = require('./openai');
 
 // fungsi utama WA BOT
 async function connectToWhatsapp() {
@@ -44,6 +45,7 @@ async function connectToWhatsapp() {
         if (!chat) {
           chat = messages[0].message.extendedTextMessage.text;
         }
+        const ambilRequest = chat.split(' ').slice(1).join(' ').toString();
 
         //membuat variabel untuk mengecek apakah pesan dari group dan mention bot
         const isMessageGroup = number.includes('@g.us');
@@ -57,7 +59,9 @@ async function connectToWhatsapp() {
 
         //logic jika mention bot saja
         if (isMessageGroup && isMessageMentionBot) {
-          await sock.sendMessage(number, { text: 'iya, ada yang bisa saya bantu?' }, { quoted: messages[0] }, 2000);
+          const req = await GPT(ambilRequest);
+          await sock.sendMessage(number, { text: req }, { quoted: messages[0] }, 2000);
+          console.log(ambilRequest);
         }
       } catch (e) {
         console.log(e);
@@ -66,6 +70,7 @@ async function connectToWhatsapp() {
   });
 }
 
+// menjalankan Whatsapp bot
 connectToWhatsapp().catch((error) => {
   console.log(error);
 });

@@ -13,6 +13,7 @@
   "dependencies": {
     "@whiskeysockets/baileys": "^6.3.0",
     "https-proxy-agent": "^7.0.0",
+    "openai": "^3.3.0",
     "qrcode-terminal": "^0.12.0"
   }
 }
