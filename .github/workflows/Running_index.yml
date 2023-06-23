@@ -6,5 +6,6 @@ jobs:
       steps:
         - run: node --version
         - run: npm --version
+        - run: npm i
         - run: node index.js
         
