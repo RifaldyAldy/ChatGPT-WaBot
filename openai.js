@@ -1,7 +1,5 @@
 const { Configuration, OpenAIApi } = require('openai');
 
-const key = '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';
-// const key = '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';
 const configuration = new Configuration({
   apiKey: key,
   baseURL: 'https://api.openai.com/v1/chat/completions',
