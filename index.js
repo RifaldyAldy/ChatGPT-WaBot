@@ -65,7 +65,7 @@ async function connectToWhatsapp() {
           await sock.sendMessage(number, { text: req }, { quoted: messages[0] }, 2000);
           // console.log(ambilRequestChat);
         }
-        if (!issMessageGroup && chat.includes('/nanya')) {
+        if (!isMessageGroup && chat.includes('/nanya')) {
           await sock.sendMessage(number, { text: 'Sebentar sedang mikir...' }, { quoted: messages[0] }, 2000);
           console.log('isi pesan nya', ambilRequestChat);
           const req = await GPT(ambilRequestChat);
