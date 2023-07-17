@@ -97,7 +97,7 @@ async function connectToWhatsapp() {
                 const list = banPeople.map((e) => `@${e}`);
                 console.log(newTag);
                 console.log(banPeople);
-                await sock.sendMessage(number, { text: `Berikut adalah anggota yang di ban: ${list}`, mentions: newTag }, { quoted: messages[0] }, 2000);
+                await sock.sendMessage(number, { text: `Berikut adalah anggota yang di ban: ${list}\n\nTotal: ${newTag.length}`, mentions: newTag }, { quoted: messages[0] }, 2000);
               } else {
                 console.log(true, banPeople.length);
                 await sock.sendMessage(number, { text: 'Tidak ada list ban untuk saat ini.' });
