@@ -86,7 +86,7 @@ async function connectToWhatsapp() {
               console.log('list ban: ', banPeople);
               console.log(ambilRequestChat.split('@')[1]);
               await sock.sendMessage(number, { text: `Berhasil! ${ambilRequestChat} telah di unban!"`, mentions: [ambilRequestChat.split('@')[1] + '@s.whatsapp.net'] }, { quoted: messages[0] }, 2000);
-            } else if (chat.includes('/ban') && messages[0].key.participant != '6289612792131@s.whatsapp.net') {
+            } else if (chat.includes('/unban') && messages[0].key.participant != '6289612792131@s.whatsapp.net') {
               await sock.sendMessage(number, { text: 'Ogah ah, fitur ini hanya bisa di pakai untuk orang tampan @6289612792131', mentions: ['6289612792131@s.whatsapp.net'] }, { quoted: messages[0] });
             }
           } else {
