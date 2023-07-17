@@ -121,21 +121,6 @@ async function connectToWhatsapp() {
             console.log(number);
             selainPesan = true;
           }
-          if (selainPesan === false) {
-            if (!isMessageGroup) {
-              await sock.sendMessage(number, { text: `Maaf, pesan anda tidak saya kenali,\nuntuk membuat pertanyaan silahkan pakai kunci \n"/nanya (pertanyaan anda)"` }, { quoted: messages[0] }, 2000);
-            } else if (isMessageGroup && isMessageMentionBot) {
-              await sock.sendMessage(
-                number,
-                {
-                  text: `Maaf, pesan anda tidak saya kenali,\nuntuk membuat pertanyaan silahkan pakai kunci \n"@tag_bot /nanya (pertanyaan anda) \n\nContoh : @628388995241 /nanya berapa derajat panas hari ini?"`,
-                  mentions: ['628388995241@s.whatsapp.net'],
-                },
-                { quoted: messages[0] },
-                2000
-              );
-            }
-          }
           if (chat === 'Error') {
             await sock.sendMessage(number, { text: 'Maaf, pesan yang saya tangkap error, silahkan kirim ulang!' });
           }
