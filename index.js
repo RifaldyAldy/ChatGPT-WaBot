@@ -89,6 +89,20 @@ async function connectToWhatsapp() {
             } else if (chat.includes('/unban') && messages[0].key.participant != '6289612792131@s.whatsapp.net') {
               await sock.sendMessage(number, { text: 'Ogah ah, fitur ini hanya bisa di pakai untuk orang tampan @6289612792131', mentions: ['6289612792131@s.whatsapp.net'] }, { quoted: messages[0] });
             }
+            if (chat.includes('/listban')) {
+              console.log('masuk!');
+              if (banPeople.length > 0) {
+                console.log(true, banPeople.length);
+                const newTag = banPeople.map((e) => e.replace('@', ' ') + '@s.whatsapp.net');
+                const list = banPeople.map((e) => `@${e}`);
+                console.log(newTag);
+                console.log(banPeople);
+                await sock.sendMessage(number, { text: `Berikut adalah anggota yang di ban: ${list}`, mentions: newTag }, { quoted: messages[0] }, 2000);
+              } else {
+                console.log(true, banPeople.length);
+                await sock.sendMessage(number, { text: 'Tidak ada list ban untuk saat ini.' });
+              }
+            }
           } else {
             await sock.sendMessage(number, { text: 'Maaf, fitur ini hanya tersedia di group' });
           }
