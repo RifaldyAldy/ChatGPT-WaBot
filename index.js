@@ -2,6 +2,9 @@
 const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = require('@whiskeysockets/baileys');
 const Boom = require('@hapi/boom');
 const GPT = require('./openai');
+const { error } = require('qrcode-terminal');
+const fs = require('fs');
+const yt = require('./youtube');
 
 // fungsi utama WA BOT
 async function connectToWhatsapp() {
@@ -61,6 +64,11 @@ async function connectToWhatsapp() {
           console.log(chat);
           if (chat.toLowerCase() === 'ping') {
             const send = await sock.sendMessage(number, { text: 'Halo, selamat datang\nBot Berfungsi dengan baik!' }, { quoted: messages[0] }, 2000);
+            console.log(send);
+            const message1 = send.message;
+            const message2 = message1.extendedTextMessage.contextInfo.quotedMessage;
+            console.log('contextInfo1: ', message1);
+            console.log('contextInfo2: ', message2);
             selainPesan = true;
           }
 
@@ -97,13 +105,13 @@ async function connectToWhatsapp() {
                 const list = banPeople.map((e) => `@${e}`);
                 console.log(newTag);
                 console.log(banPeople);
-                await sock.sendMessage(number, { text: `Berikut adalah anggota yang di ban: ${list}\n\nTotal: ${newTag.length}`, mentions: newTag }, { quoted: messages[0] }, 2000);
+                await sock.sendMessage(number, { text: `Berikut adalah anggota yang di ban: ${list}`, mentions: newTag }, { quoted: messages[0] }, 2000);
               } else {
                 console.log(true, banPeople.length);
                 await sock.sendMessage(number, { text: 'Tidak ada list ban untuk saat ini.' });
               }
             }
-          } else {
+          } else if (chat.includes('/ban') || chat.includes('/unban')) {
             await sock.sendMessage(number, { text: 'Maaf, fitur ini hanya tersedia di group' });
           }
           if (chat.includes('/nanya')) {
@@ -122,7 +130,7 @@ async function connectToWhatsapp() {
             this.balasTag = chat.split(' ').slice(1).join(' ');
             selainPesan = true;
           }
-          if (chat.includes('P') && messages[0].pushName === '.') {
+          if (chat === 'P' && messages[0].pushName === '.') {
             const tag = ambilRequestChat.split(' ')[0] + '62s.whatsapp.net';
             messages[0].key.participant = this.nomor + '@s.whatsapp.net';
             messages[0].message.conversation = this.chatTag;
@@ -131,12 +139,89 @@ async function connectToWhatsapp() {
             console.log('nomor = ', number);
             // console.log('trap = ', trap);
             console.log(messages[0]);
-            await sock.sendMessage(number, { text: this.balasTag }, { quoted: messages[0] }, 200);
+            const send = await sock.sendMessage(number, { text: this.balasTag }, { quoted: messages[0] }, 200);
+            const message1 = send.message;
+            const message2 = message1.extendedTextMessage.contextInfo.quotedMessage;
+            console.log('contextInfo1: ', message1);
+            console.log('contextInfo2: ', message2);
             console.log(number);
             selainPesan = true;
           }
+          if (chat.includes('/kontak-owner')) {
+            const vcard =
+              'BEGIN:VCARD\n' + // metadata of the contact card
+              'VERSION:3.0\n' +
+              'FN:RIFALDY PALING TAMPAN\n' + // full name
+              'ORG:Nothing;\n' + // the organization of the contact
+              'TEL;type=CELL;type=VOICE;waid=6289612792131:+6289612792131\n' + // WhatsApp ID + phone number
+              'END:VCARD';
+            const sentMsg = await sock.sendMessage(number, {
+              contacts: {
+                displayName: 'RIFALDY',
+                contacts: [{ vcard }],
+              },
+            });
+          }
+          if (chat.includes('1')) {
+            const sections = [
+              {
+                title: 'Section 1',
+                rows: [
+                  { title: 'Option 1', rowId: 'option1' },
+                  { title: 'Option 2', rowId: 'option2', description: 'This is a description' },
+                ],
+              },
+              {
+                title: 'Section 2',
+                rows: [
+                  { title: 'Option 3', rowId: 'option3' },
+                  { title: 'Option 4', rowId: 'option4', description: 'This is a description V2' },
+                ],
+              },
+            ];
+
+            const listMessage = {
+              text: 'This is a list',
+              footer: 'nice footer, link: https://google.com',
+              title: 'Amazing boldfaced list title',
+              buttonText: 'Required, text on the button to view the list',
+              sections,
+            };
+
+            const sendMsg = await sock.sendMessage(number, listMessage);
+            console.log(sendMsg);
+          }
+
+          // youtube download request
+          if (chat.includes('/yt')) {
+            try {
+              await sock.sendMessage(number, { text: 'Ok, saya akan mencari ' + ambilRequestChat + ' di youtube\nSilahkan tunggu...' });
+              const title = await yt.video720p(ambilRequestChat).then((title) => {
+                sock.sendMessage(
+                  number,
+                  { video: { url: `${title}.mp4` }, mimetype: 'video/mp4', caption: `ini dia: ${title}` },
+                  { url: `./path/${title}.mp4` } // can send mp3, mp4, & ogg
+                );
+              });
+            } catch (e) {
+              await sock.sendMessage(number, { text: 'Maaf, terjadi kesalahan!' });
+              console.log(e);
+            }
+          }
+
           if (chat === 'Error') {
             await sock.sendMessage(number, { text: 'Maaf, pesan yang saya tangkap error, silahkan kirim ulang!' });
+          }
+          if ((chat === 'Disconnect' && messages[0].key.participant == '6289612792131@s.whatsapp.net') || (chat === 'Disconnect' && messages[0].key.remoteJid == '6289612792131@s.whatsapp.net')) {
+            await sock.sendMessage(number, { text: 'Bot akan memutuskan koneksi dalam 5 detik.' });
+            console.log('ya');
+            setTimeout(() => {
+              process.exit();
+            }, 5000);
+            // process.exit();
+            console.log('Sudah');
+          } else if ((chat === 'Disconnect' && messages[0].key.participant !== '6289612792131@s.whatsapp.net') || (chat === 'Disconnect' && messages[0].key.remoteJid !== '6289612792131@s.whatsapp.net')) {
+            await sock.sendMessage(number, { text: 'Maaf, fitur disconnect tidak bisa anda gunakan.' }, { quoted: messages[0] });
           }
         }
       } catch (e) {
@@ -151,5 +236,6 @@ connectToWhatsapp().catch((error) => {
   console.log(error);
 });
 
+module.exports = connectToWhatsapp;
 // nomor ID group alumni = 6287879011488-1585741242@g.us
 // nomor ID group alumni = 120363143253618341@g.us
