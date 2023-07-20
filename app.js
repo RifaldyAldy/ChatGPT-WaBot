@@ -28,6 +28,6 @@ server = app.listen(port, async () => {
 });
 console.log(server);
 
-// bot().catch((e) => {
-//   console.log(e);
-// });
+bot().catch((e) => {
+  console.log(e);
+});
