@@ -17,7 +17,7 @@ const video720p = async (search,quality) => {
   // fs.createWriteStream(outputFilePath);
 
   await new Promise((r, re) => {
-    ytdl(videoUrl, { quality: {quality: '136' } })
+    ytdl(videoUrl, { quality: '136'  })
       .pipe(videoWriteStream)
       .on('finish', () => {
         r();
