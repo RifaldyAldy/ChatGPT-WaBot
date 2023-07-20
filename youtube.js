@@ -13,29 +13,37 @@ const video720p = async (search) => {
   const videoUrl = url;
   const outputFilePath = title + '.mp4';
 
-  const videoWriteStream = fs.createWriteStream('video.mp4');
+  const videoWriteStream = fs.createWriteStream(title + '1.mp4');
+  // fs.createWriteStream(outputFilePath);
 
-  ytdl(videoUrl, { quality: 'highestvideo' })
-    .pipe(videoWriteStream)
-    .on('finish', () => {
-      const audioStream = ytdl(videoUrl, { quality: 'highestaudio' });
-
-      const ffmpegProcess = spawn(ffmpeg, ['-i', 'video.mp4', '-i', 'pipe:0', '-c:v', 'copy', '-c:a', 'copy', '-strict', '-2', outputFilePath]);
-
-      audioStream.pipe(ffmpegProcess.stdin);
-
-      ffmpegProcess.on('error', (err) => {
-        console.error('Terjadi kesalahan saat menggunakan ffmpeg:', err);
+  await new Promise((r, re) => {
+    ytdl(videoUrl, { quality: 'highestvideo' })
+      .pipe(videoWriteStream)
+      .on('finish', () => {
+        r();
+      })
+      .on('error', (e) => {
+        re(e);
       });
+  });
+  const audioStream = ytdl(videoUrl, { quality: 'highestaudio' });
 
-      ffmpegProcess.on('close', () => {
-        console.log('Penggabungan video dan audio selesai.');
-        fs.unlinkSync('video.mp4');
-      });
-    })
-    .on('error', (err) => {
-      console.error('Terjadi kesalahan saat mengunduh video:', err);
+  const ffmpegProcess = spawn(ffmpeg, ['-i', title + '1.mp4', '-i', 'pipe:0', '-c:v', 'copy', '-c:a', 'copy', '-strict', '-2', outputFilePath]);
+
+  audioStream.pipe(ffmpegProcess.stdin);
+
+  await new Promise((resolve, reject) => {
+    ffmpegProcess.on('error', (err) => {
+      console.error('Terjadi kesalahan saat menggunakan ffmpeg:', err);
+      reject(err);
     });
+
+    ffmpegProcess.on('close', () => {
+      console.log('Penggabungan video dan audio selesai.');
+      resolve(); // Resolve the Promise when ffmpeg process is completed.
+    });
+  });
+
   return title;
 };
 
@@ -61,5 +69,4 @@ const audioonly = async (search) => {
   //   console.log(format[1].url);
   return format;
 };
-
-module.exports = { audioonly, video720p };
+module.exports = { video720p, audioonly };
