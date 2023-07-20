@@ -6,7 +6,7 @@ const { spawn } = require('child_process');
 const ffmpeg = require('ffmpeg-static');
 // Import the yt-search package.
 
-const video720p = async (search,quality) => {
+const video720p = async (search) => {
   const getInfoVideo = await ytSearch(search);
   const url = getInfoVideo.videos[0].url;
   const title = getInfoVideo.videos[0].title;
@@ -17,7 +17,7 @@ const video720p = async (search,quality) => {
   // fs.createWriteStream(outputFilePath);
 
   await new Promise((r, re) => {
-    ytdl(videoUrl, { quality: '136'  })
+    ytdl(videoUrl, { quality: 'lowestvideo' })
       .pipe(videoWriteStream)
       .on('finish', () => {
         r();
@@ -48,26 +48,70 @@ const video720p = async (search,quality) => {
 };
 
 const audioonly = async (search) => {
-  const getInfoVideo = await ytSearch(search);
-  const url = getInfoVideo.videos[0].url;
-  const title = getInfoVideo.videos[0].title;
-  let info = await ytdl.getInfo(url);
-  let format = ytdl.filterFormats(info.formats, 'audioonly');
-
-  // download menggunakan url dari axios
-  let format2 = format.filter((e) => e.container === 'mp4');
-  console.log(format2);
   try {
-    const download = await axios.get(format2[0].url, { responseType: 'stream' });
-    // download.data.pipe(fs.createWriteStream('music/' + title + '.mp4a'));
-    console.log('result:', download);
+    const getInfoVideo = await ytSearch(search);
+    const url = getInfoVideo.videos[0].url;
+    const title = getInfoVideo.videos[0].title;
+    let info = await ytdl.getInfo(url);
+    let format = ytdl.filterFormats(info.formats, 'audioonly');
+
+    // download menggunakan url dari axios
+    let format2 = format.filter((e) => e.container === 'mp4');
+    // console.log(ytdl.getInfo(url).then((e) => console.log(e.formats)));
+
+    const download = await ytdl(url, { quality: 'highestaudio' });
+    console.log(download);
+    await new Promise((resolve, reject) => {
+      download
+        .pipe(fs.createWriteStream(title + '.mp3'))
+        .on('finish', () => {
+          console.log('sudah');
+          resolve();
+        })
+        .on('error', (e) => {
+          reject(e);
+        });
+    });
+    console.log('berhasil!');
+    return title;
   } catch (e) {
     console.log(e);
   }
   //   const audioStream = await ytdl(videoUrl, { quality: 'highestaudio' });
   //   console.log('Formats with only audio: ' + format.length);
   //   console.log(format[1].url);
-  return format;
 };
-video720p('ya');
+// const audioonly = async (search) => {
+//   try {
+//     const getInfoVideo = await ytSearch(search);
+//     const url = getInfoVideo.videos[0].url;
+//     const title = getInfoVideo.videos[0].title;
+//     let info = await ytdl.getInfo(url);
+//     let format = ytdl.filterFormats(info.formats, 'audioonly');
+
+//     // download menggunakan url dari axios
+//     let format2 = format.filter((e) => e.container === 'mp4');
+
+//     const download = await axios.get(format2[0].url, { responseType: 'stream' });
+//     await new Promise((resolve, reject) => {
+//       download.data
+//         .pipe(fs.createWriteStream(title + '.mp3'))
+//         .on('finish', () => {
+//           console.log('sudah');
+//           resolve();
+//         })
+//         .on('error', (e) => {
+//           reject(e);
+//         });
+//     });
+//     console.log('berhasil!');
+//   } catch (e) {
+//     console.log(e);
+//   }
+//   //   const audioStream = await ytdl(videoUrl, { quality: 'highestaudio' });
+//   //   console.log('Formats with only audio: ' + format.length);
+//   //   console.log(format[1].url);
+//   return title;
+// };
+// video720p('ya');
 module.exports = { video720p, audioonly };
