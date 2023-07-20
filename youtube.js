@@ -6,7 +6,7 @@ const { spawn } = require('child_process');
 const ffmpeg = require('ffmpeg-static');
 // Import the yt-search package.
 
-const video720p = async (search) => {
+const video720p = async (search,quality) => {
   const getInfoVideo = await ytSearch(search);
   const url = getInfoVideo.videos[0].url;
   const title = getInfoVideo.videos[0].title;
