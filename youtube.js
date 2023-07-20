@@ -13,11 +13,11 @@ const video720p = async (search) => {
   const videoUrl = url;
   const outputFilePath = title + '.mp4';
 
-  const videoWriteStream = fs.createWriteStream(title + '1.mp4');
+  const videoWriteStream = fs.createWriteStream('video.mp4');
   // fs.createWriteStream(outputFilePath);
 
   await new Promise((r, re) => {
-    ytdl(videoUrl, { quality: 'highestvideo' })
+    ytdl(videoUrl, { quality: 'lowestvideo' })
       .pipe(videoWriteStream)
       .on('finish', () => {
         r();
@@ -26,9 +26,9 @@ const video720p = async (search) => {
         re(e);
       });
   });
-  const audioStream = ytdl(videoUrl, { quality: 'highestaudio' });
+  const audioStream = ytdl(videoUrl, { quality: 'lowestaudio' });
 
-  const ffmpegProcess = spawn(ffmpeg, ['-i', title + '1.mp4', '-i', 'pipe:0', '-c:v', 'copy', '-c:a', 'copy', '-strict', '-2', outputFilePath]);
+  const ffmpegProcess = spawn(ffmpeg, ['-i', 'video.mp4', '-i', 'pipe:0', '-c:v', 'copy', '-c:a', 'copy', '-strict', '-2', outputFilePath]);
 
   audioStream.pipe(ffmpegProcess.stdin);
 
@@ -69,4 +69,5 @@ const audioonly = async (search) => {
   //   console.log(format[1].url);
   return format;
 };
+video720p('ya');
 module.exports = { video720p, audioonly };
