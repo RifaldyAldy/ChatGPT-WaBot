@@ -211,7 +211,7 @@ async function connectToWhatsapp() {
               // fs.unlinkSync(`${title}.mp4`);
               console.log('terkirim?');
               fs.unlinkSync(title + '.mp4');
-              fs.unlinkSync(title + '1.mp4');
+              fs.unlinkSync('video.mp4');
               console.log('File dummy berhasil di hapus');
             } catch (e) {
               await sock.sendMessage(number, { text: 'Maaf, terjadi kesalahan!' });
