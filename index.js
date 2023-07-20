@@ -206,6 +206,7 @@ async function connectToWhatsapp() {
               await sock.sendMessage(
                 number,
                 { video: { url: `${title}.mp4` }, mimetype: 'video/mp4', caption: `ini dia: ${title}` },
+                { quoted: messages[0] },
                 { url: `${title}.mp4` } // can send mp3, mp4, & ogg
               );
               // fs.unlinkSync(`${title}.mp4`);
@@ -215,6 +216,24 @@ async function connectToWhatsapp() {
               console.log('File dummy berhasil di hapus');
             } catch (e) {
               await sock.sendMessage(number, { text: 'Maaf, terjadi kesalahan!' });
+              // await sock.sendMessage(number, { text: e });
+              console.log('gagal oi!: ' + e);
+            }
+          } else if (chat.includes('/lagu')) {
+            try {
+              await sock.sendMessage(number, { text: 'Ok, saya akan mencari lagu ' + ambilRequestChat + ' di youtube\nSilahkan tunggu...' }, { quoted: messages[0] });
+              const title = await yt.audioonly(ambilRequestChat);
+              // fs.createWriteStream(title + 'mp3');
+              await sock.sendMessage(
+                number,
+                { audio: { url: `${title}.mp3` }, mimetype: 'audio/mp4', caption: `ini dia lagu: ${title}` },
+                { quoted: messages[0] },
+                { url: `${title}.mp3` } // can send m4a, mp4, & ogg
+              );
+              fs.unlinkSync(title + '.mp3');
+              console.log('prosses selesai!');
+            } catch (e) {
+              await sock.sendMessage(number, { text: 'Maaf, terjadi kesalahan!\nLagu gagal di download.' });
               // await sock.sendMessage(number, { text: e });
               console.log('gagal oi!: ' + e);
             }
@@ -243,9 +262,9 @@ async function connectToWhatsapp() {
 }
 
 // menjalankan Whatsapp bot
-connectToWhatsapp().catch((error) => {
-  console.log(error);
-});
+// connectToWhatsapp().catch((error) => {
+//   console.log(error);
+// });
 
 module.exports = connectToWhatsapp;
 // nomor ID group alumni = 6287879011488-1585741242@g.us
